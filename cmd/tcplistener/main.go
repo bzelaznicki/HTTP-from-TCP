@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/bzelaznicki/HTTP-from-TCP/internal/request"
 	"log"
 	"net"
 )
@@ -26,11 +27,16 @@ func main() {
 
 		fmt.Println("Connection accepted")
 
-		ch := getLinesChannel(c)
+		data, err := request.RequestFromReader(c)
 
-		for line := range ch {
-			fmt.Printf("%s\n", line)
+		if err != nil {
+			log.Fatal(err)
 		}
+		fmt.Println("Request line:")
+		fmt.Println("- Method:", data.RequestLine.Method)
+		fmt.Println("- Target:", data.RequestLine.RequestTarget)
+		fmt.Println("- Version:", data.RequestLine.HttpVersion)
+
 		fmt.Printf("Connection to %s closed.\n", c.RemoteAddr())
 	}
 }
