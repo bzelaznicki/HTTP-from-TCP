@@ -25,7 +25,13 @@ func (h Headers) Parse(data []byte) (n int, done bool, err error) {
 	if err != nil {
 		return 0, false, err
 	}
-	h[name] = value
+	_, exists := h[name]
+	if !exists {
+		h[name] = value
+	} else {
+		h[name] = h[name] + ", " + value
+	}
+
 	return i + 2, false, nil
 }
 
