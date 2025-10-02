@@ -39,7 +39,27 @@ func parseHeader(fieldLine []byte) (string, string, error) {
 	if len(name) == 0 || bytes.ContainsAny(name, " \t") {
 		return "", "", fmt.Errorf("malformed field name")
 	}
-
+	if !validHeaderKey(name) {
+		return "", "", fmt.Errorf("invalid header key")
+	}
+	name = bytes.ToLower(name)
 	value := bytes.TrimSpace(parts[1])
+
 	return string(name), string(value), nil
+}
+
+func validHeaderKey(b []byte) bool {
+	for _, c := range b {
+		switch {
+		case c >= 'A' && c <= 'Z':
+		case c >= 'a' && c <= 'z':
+		case c >= '0' && c <= '9':
+		case c == '!' || c == '#' || c == '$' || c == '%' || c == '&' ||
+			c == '\'' || c == '*' || c == '+' || c == '-' || c == '.' ||
+			c == '^' || c == '_' || c == '`' || c == '|' || c == '~':
+		default:
+			return false
+		}
+	}
+	return len(b) > 0
 }
